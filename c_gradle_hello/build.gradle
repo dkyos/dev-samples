@@ -1,0 +1,20 @@
+apply plugin: 'c'
+
+model {
+    components {
+        hello(NativeExecutableSpec) {
+            sources {
+                c {
+                    source {
+                        srcDir "src"
+                        include "**/*.c"
+                    }
+                    exportedHeaders {
+                        srcDir "src/include"
+                    }
+                }
+            }
+        }
+    }
+}
+
