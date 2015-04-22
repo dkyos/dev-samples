@@ -7,7 +7,7 @@ model {
                 c {
                     source {
                         srcDir "src"
-                        include "**/*.c"
+                            include "**/*.c"
                     }
                     exportedHeaders {
                         srcDir "src/include"
@@ -18,3 +18,6 @@ model {
     }
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
