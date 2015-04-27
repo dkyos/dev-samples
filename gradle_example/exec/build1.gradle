@@ -1,0 +1,14 @@
+
+task hello << {
+    def stdout = new ByteArrayOutputStream()
+        exec{
+            if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+                commandLine 'cmd', '/c', 'whoami'
+            } else {
+                commandLine 'whoami'
+            }
+            standardOutput = stdout;
+        }
+    println "Output:$stdout \n\n";
+}
+

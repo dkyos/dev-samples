@@ -1,0 +1,10 @@
+
+task hello3{
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        ignoreExitValue = true
+        executable "/home/dkyun77/tizen-sdk/tools/sdb"
+        args "help"
+        standardOutput = stdout;
+    }
+}

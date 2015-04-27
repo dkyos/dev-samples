@@ -1,0 +1,38 @@
+apply plugin: 'cpp'
+
+model {
+    components {
+        hello(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src"
+                        include "**/*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/include"
+                    }
+                }
+            }
+        }
+    }
+}
+
+binaries.all {
+    // Define a preprocessor macro for every binary
+    cppCompiler.define "NDEBUG"
+
+    // Define toolchain-specific compiler and linker options
+    if (toolChain in Gcc) {
+        cppCompiler.args "-O2", "-fno-access-control", "-DTEST"
+        linker.args "-Xlinker", "-S"
+    }
+    if (toolChain in VisualCpp) {
+        cppCompiler.args "/Zi"
+        linker.args "/DEBUG"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}

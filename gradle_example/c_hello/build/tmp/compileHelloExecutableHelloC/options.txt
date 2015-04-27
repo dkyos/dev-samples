@@ -1,0 +1,9 @@
+-x
+c
+-c
+-I
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello/src/include
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello/src/hello.c
+-o
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello/build/objs/helloExecutable/helloC/1o6ublw5g7c2jlvhr10jhdu51/hello.o
+-m64

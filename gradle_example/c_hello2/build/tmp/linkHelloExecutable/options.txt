@@ -1,0 +1,6 @@
+-o
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello2/build/binaries/helloExecutable/hello
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello2/build/objs/helloExecutable/helloCpp/cui9acghapj4m18oryttf6sbd/hello.o
+-Xlinker
+-S
+-m64

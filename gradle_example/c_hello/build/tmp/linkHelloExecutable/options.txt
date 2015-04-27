@@ -1,0 +1,4 @@
+-o
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello/build/binaries/helloExecutable/hello
+/home/dkyun77/dkyos/dev-samples/c_gradle_hello/build/objs/helloExecutable/helloC/1o6ublw5g7c2jlvhr10jhdu51/hello.o
+-m64

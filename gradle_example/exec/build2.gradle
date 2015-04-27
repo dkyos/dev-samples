@@ -1,0 +1,19 @@
+
+def doMyThing(String target) {
+    exec {
+        executable "echo"
+        args "============================="
+    }
+    exec {
+        executable "ls"
+        args "-al", target
+    }
+}
+
+task hello{
+    doLast {
+        doMyThing("/")
+        doMyThing("/opt")
+    }
+}
+
