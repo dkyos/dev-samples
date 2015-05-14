@@ -1,0 +1,47 @@
+
+def CMD_PATH='/home/dkyun77/tizen-sdk/tools/ide/bin'
+
+task create(type:Exec) {
+    //workingDir CMD_PATH
+
+    ignoreExitValue = true
+
+	def CMD="${CMD_PATH}" + '/tizen'
+
+    commandLine "${CMD}", 'create', 'native-project', '-p', 'mobile-2.3.1', '-t', 'basic-ui', '-n','basicui','--', './'
+
+	File file = new File("asdf")  
+	println "file has ${file.length()} bytes"
+
+	//String fileContents = new File("asdf").text
+	//println (fileContents)
+
+	standardOutput = new ByteArrayOutputStream()
+	errorOutput = standardOutput
+	doLast {
+		if (execResult.exitValue != 0) {
+			println("========================================")
+			println("Exit Value is " + execResult.exitValue)
+			println("----------------------")
+			//println(standardOutput.toString())
+			println(errorOutput.toString())
+			println("========================================")
+		}else{
+			println("========================================")
+			println("Exit Value is " + execResult.exitValue)
+			println("----------------------")
+
+			def version = "Smart Development Bridge version"
+			if( errorOutput.toString().contains(version) ){
+				println "same"
+			}else{
+				println "not same"
+			}
+
+			//println(standardOutput.toString())
+			println(errorOutput.toString())
+			println("========================================")
+		}
+	}
+}
+
