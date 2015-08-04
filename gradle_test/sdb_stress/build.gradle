@@ -1,0 +1,29 @@
+
+def CMD_PATH='/home/dkyun77/tizen-sdk/tools'
+def CMD="${CMD_PATH}" + '/sdb';
+
+task stress1 << {
+    int i = 0;
+    while ( 1 ){
+        println (" Iteration: " + i++);
+        def process = ["${CMD}","shell", "ls -alh"].execute();
+        process.waitFor();
+        println process.exitValue();
+        println process.in.text;
+        println process.err.text;
+        //sleep(1000);
+    }
+}
+
+task stress2 << {
+    int i = 0;
+    while ( 1 ){
+        println (" Iteration: " + i++);
+        def process = ["${CMD}","shell", "pkgcmd -l"].execute();
+        process.waitFor();
+        println process.exitValue();
+        println process.in.text;
+        println process.err.text;
+        //sleep(1000);
+    }
+}
