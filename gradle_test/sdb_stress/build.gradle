@@ -1,12 +1,26 @@
 
 def CMD_PATH='/home/dkyun77/tizen-sdk/tools'
-def CMD="${CMD_PATH}" + '/sdb';
+
+// on linux
+//def CMD="${CMD_PATH}" + '/sdb';
+
+// on Windows
+def CMD="cmd " + "${CMD_PATH}" + 'sdb';
+//task runNotepad(type: Exec) {
+//        description 'Demonstrate the problem independent of java'
+//            commandLine 'cmd', '/c', 'cmd /c start notepad.exe'
+//}
 
 task stress1 << {
     int i = 0;
     while ( 1 ){
         println (" Iteration: " + i++);
+
+        println (" CMD: " + '${CMD}');
+
         def process = ["${CMD}","shell", "ls -alh"].execute();
+        //on windows:
+        //commandLine 'cmd', '/c', 'stop.bat'
         process.waitFor();
         println process.exitValue();
         println process.in.text;
