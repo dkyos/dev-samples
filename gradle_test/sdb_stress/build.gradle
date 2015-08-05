@@ -1,43 +1,61 @@
+// ./gradlew -q -PITER=20
 
-def CMD_PATH='/home/dkyun77/tizen-sdk/tools'
+import org.apache.tools.ant.taskdefs.condition.Os
 
-// on linux
-//def CMD="${CMD_PATH}" + '/sdb';
+task checkWin() {
+	def CMD_PATH='';
 
-// on Windows
-def CMD="cmd " + "${CMD_PATH}" + 'sdb';
-//task runNotepad(type: Exec) {
-//        description 'Demonstrate the problem independent of java'
-//            commandLine 'cmd', '/c', 'cmd /c start notepad.exe'
-//}
+	println ("================================");
+	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		println "*** Windows";
+		CMD_PATH='C:/tizen-sdk/tools/sdb';
+	}else{
+		println "*** Not Windwos";
+		CMD_PATH='/home/dkyun77/tizen-sdk/tools/sdb';
+	}
 
-task stress1 << {
-    int i = 0;
-    while ( 1 ){
-        println (" Iteration: " + i++);
+	project.ext.set("sdbPath", "${CMD_PATH}");
+	println (" sdb: " + project.sdbPath);
 
-        println (" CMD: " + '${CMD}');
+	int iter = 0;
 
-        def process = ["${CMD}","shell", "ls -alh"].execute();
-        //on windows:
-        //commandLine 'cmd', '/c', 'stop.bat'
-        process.waitFor();
-        println process.exitValue();
-        println process.in.text;
-        println process.err.text;
-        //sleep(1000);
-    }
+	if( project.hasProperty("ITER")) {
+		iter = "${ITER}".toInteger();
+	}else{
+		iter = 10;
+	}
+
+	project.ext.set("iter", iter);
+	println (" iteration: " + project.iter);
+	println ("================================");
 }
 
-task stress2 << {
-    int i = 0;
-    while ( 1 ){
-        println (" Iteration: " + i++);
-        def process = ["${CMD}","shell", "pkgcmd -l"].execute();
-        process.waitFor();
-        println process.exitValue();
-        println process.in.text;
-        println process.err.text;
-        //sleep(1000);
-    }
+task stress1() << {
+	int i = 0;
+	def CMD = project.sdbPath;
+
+	while ( i < project.iter ){
+		println ("Iteration: " + i++);
+		//def process = ["${CMD}","shell", "ls -alh"].execute();
+		def process = ["${CMD}","version"].execute();
+		process.waitFor();
+		println ("Exit value: " + process.exitValue());
+		println process.in.text;
+		println process.err.text;
+		//sleep(1000);
+	}
+}
+
+task stress2() << {
+	int i = 0;
+	def CMD = project.sdbPath;
+
+	while ( i < project.iter ){
+		println ("Iteration: " + i++);
+		def process = ["${CMD}","shell", "pkgcmd -l"].execute();
+		process.waitFor();
+		println ("Exit value: " + process.exitValue());
+		println process.in.text;
+		println process.err.text;
+	}
 }
