@@ -1,61 +1,79 @@
-// ./gradlew -q -PITER=20
+// ./gradlew -q stress1 -PITER=200
+// ./gradlew -q s1 -PITER=300
+// ./gradlew -q stress2 -PITER=400
+// ./gradlew -q s2 -PITER=500
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
+defaultTasks 'checkWin'
+
 task checkWin() {
-	def CMD_PATH='';
+    def CMD_PATH='';
 
-	println ("================================");
-	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-		println "*** Windows";
-		CMD_PATH='C:/tizen-sdk/tools/sdb';
-	}else{
-		println "*** Not Windwos";
-		CMD_PATH='/home/dkyun77/tizen-sdk/tools/sdb';
-	}
+    println ("================================");
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        println "*** Windows";
+        CMD_PATH='C:/tizen-sdk/tools/sdb';
+    }else{
+        println "*** Not Windwos";
+        CMD_PATH='/home/dkyun77/tizen-sdk/tools/sdb';
+    }
 
-	project.ext.set("sdbPath", "${CMD_PATH}");
-	println (" sdb: " + project.sdbPath);
+    project.ext.set("sdbPath", "${CMD_PATH}");
+    println (" sdb: " + project.sdbPath);
 
-	int iter = 0;
+    int iter = 0;
 
-	if( project.hasProperty("ITER")) {
-		iter = "${ITER}".toInteger();
-	}else{
-		iter = 10;
-	}
+    if( project.hasProperty("ITER")) {
+        iter = "${ITER}".toInteger();
+    }else{
+        iter = 10;
+    }
 
-	project.ext.set("iter", iter);
-	println (" iteration: " + project.iter);
-	println ("================================");
+    project.ext.set("iter", iter);
+    println (" iteration: " + project.iter);
+    println ("================================");
 }
 
-task stress1() << {
-	int i = 0;
-	def CMD = project.sdbPath;
+task stress1(dependsOn: checkWin) << {
+    int i = 0;
+    def CMD = project.sdbPath;
 
-	while ( i < project.iter ){
-		println ("Iteration: " + i++);
-		//def process = ["${CMD}","shell", "ls -alh"].execute();
-		def process = ["${CMD}","version"].execute();
-		process.waitFor();
-		println ("Exit value: " + process.exitValue());
-		println process.in.text;
-		println process.err.text;
-		//sleep(1000);
-	}
+    while ( i < project.iter ){
+        println ("Iteration: " + i++);
+        def process = ["${CMD}","shell", "ls -alh"].execute();
+        process.waitFor();
+        println ("Exit value: " + process.exitValue());
+        println process.in.text;
+        println process.err.text;
+    }
 }
 
-task stress2() << {
-	int i = 0;
-	def CMD = project.sdbPath;
+task stress2(dependsOn: checkWin) << {
+    int i = 0;
+    def CMD = project.sdbPath;
 
-	while ( i < project.iter ){
-		println ("Iteration: " + i++);
-		def process = ["${CMD}","shell", "pkgcmd -l"].execute();
-		process.waitFor();
-		println ("Exit value: " + process.exitValue());
-		println process.in.text;
-		println process.err.text;
-	}
+    while ( i < project.iter ){
+        println ("Iteration: " + i++);
+        def process = ["${CMD}","shell", "pkgcmd -l"].execute();
+        process.waitFor();
+        println ("Exit value: " + process.exitValue());
+        println process.in.text;
+        println process.err.text;
+    }
 }
+
+task stress3(dependsOn: checkWin) << {
+    int i = 0;
+    def CMD = project.sdbPath;
+
+    while ( i < project.iter ){
+        println ("Iteration: " + i++);
+        def process = ["${CMD}","shell", "dump_systemstate"].execute();
+        process.waitFor();
+        println ("Exit value: " + process.exitValue());
+        println process.in.text;
+        println process.err.text;
+    }
+}
+
