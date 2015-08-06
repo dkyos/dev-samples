@@ -13,7 +13,7 @@ task checkWin() {
     println ("================================");
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
         println "*** Windows";
-        CMD_PATH='C:/tizen-sdk/tools/sdb';
+        CMD_PATH='C:/tizen-2.4-sdk/tools/sdb';
     }else{
         println "*** Not Windwos";
         CMD_PATH='/home/dkyun77/tizen-sdk/tools/sdb';
@@ -38,42 +38,51 @@ task checkWin() {
 task stress1(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
+    def sout = new StringBuilder()
+    def serr = new StringBuilder()
 
     while ( i < project.iter ){
         println ("Iteration: " + i++);
         def process = ["${CMD}","shell", "ls -alh"].execute();
+        process.consumeProcessOutput(sout, serr)
         process.waitFor();
         println ("Exit value: " + process.exitValue());
-        println process.in.text;
-        println process.err.text;
+        println "$sout"
+        println "$serr"
     }
 }
 
 task stress2(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
+    def sout = new StringBuilder()
+    def serr = new StringBuilder()
 
     while ( i < project.iter ){
         println ("Iteration: " + i++);
         def process = ["${CMD}","shell", "pkgcmd -l"].execute();
+        process.consumeProcessOutput(sout, serr)
         process.waitFor();
         println ("Exit value: " + process.exitValue());
-        println process.in.text;
-        println process.err.text;
+        println "$sout"
+        println "$serr"
     }
 }
 
 task stress3(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
+    def sout = new StringBuilder()
+    def serr = new StringBuilder()
 
     while ( i < project.iter ){
         println ("Iteration: " + i++);
         def process = ["${CMD}","shell", "dump_systemstate"].execute();
+        process.consumeProcessOutput(sout, serr)
         process.waitFor();
         println ("Exit value: " + process.exitValue());
-        println process.in.text;
-        println process.err.text;
+        println "$sout"
+        println "$serr"
     }
 }
 
