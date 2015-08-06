@@ -1,7 +1,7 @@
-// ./gradlew -q stress1 -PITER=200
-// ./gradlew -q s1 -PITER=300
-// ./gradlew -q stress2 -PITER=400
-// ./gradlew -q s2 -PITER=500
+// ./gradlew -q cmd1 -PITER=200
+// ./gradlew -q c1 -PITER=300
+// ./gradlew -q cmd2 -PITER=400
+// ./gradlew -q c2 -PITER=500
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -35,7 +35,7 @@ task checkWin() {
     println ("================================");
 }
 
-task stress1(dependsOn: checkWin) << {
+task cmd1(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
     def sout = new StringBuilder()
@@ -52,7 +52,7 @@ task stress1(dependsOn: checkWin) << {
     }
 }
 
-task stress2(dependsOn: checkWin) << {
+task cmd2(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
     def sout = new StringBuilder()
@@ -69,7 +69,7 @@ task stress2(dependsOn: checkWin) << {
     }
 }
 
-task stress3(dependsOn: checkWin) << {
+task cmd3(dependsOn: checkWin) << {
     int i = 0;
     def CMD = project.sdbPath;
     def sout = new StringBuilder()
@@ -85,4 +85,38 @@ task stress3(dependsOn: checkWin) << {
         println "$serr"
     }
 }
+
+
+task push1(dependsOn: checkWin) << {
+    int i = 0;
+    def CMD = project.sdbPath;
+    def sout = new StringBuilder()
+    def serr = new StringBuilder()
+
+    File file = new File("test.txt")
+
+    while ( i < project.iter ){
+        println ("Iteration: " + i++);
+        def process = ["${CMD}","shell", "dump_systemstate"].execute();
+        process.consumeProcessOutput(sout, serr)
+        process.waitFor();
+        println ("Exit value: " + process.exitValue());
+
+        file << "$sout"
+        process = ["${CMD}","push", "test.txt", "/home/developer"].execute();
+        process.consumeProcessOutput(sout, serr)
+        process.waitFor();
+        sout.setLength(0);
+        serr.setLength(0);
+
+        process = ["${CMD}","shell", "ls -al /home/developer"].execute();
+        process.consumeProcessOutput(sout, serr)
+        process.waitFor();
+        println "$sout"
+        println "$serr"
+    }
+
+    file.delete();
+}
+
 
