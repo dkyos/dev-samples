@@ -1,47 +1,129 @@
+// ./gradlew -q -Pprofile=mobile test1
+// ./gradlew -q -Pprofile=wearable test1
+// ./gradlew -q -Pprofile=tv test1
 
-def CMD_PATH='/home/dkyun77/tizen-sdk/tools/ide/bin'
+import org.apache.tools.ant.taskdefs.condition.Os
 
-task create(type:Exec) {
-    //workingDir CMD_PATH
+defaultTasks 'checkWin'
 
-    ignoreExitValue = true
+task checkWin() {
+	def CMD_PATH='';
+	String Profile;
 
-	def CMD="${CMD_PATH}" + '/tizen'
+	println ("================================");
+	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		println "*** Windows";
+		CMD_PATH='C:/tizen-sdk/tools/ide/bin/tizen.bat';
+	}else{
+		println "*** Not Windwos";
+		CMD_PATH='/home/dkyun77/tizen-sdk/tools/ide/bin/tizen';
+	}
 
-    commandLine "${CMD}", 'create', 'native-project', '-p', 'mobile-2.3.1', '-t', 'basic-ui', '-n','basicui','--', './'
+	project.ext.set("tizenPath", "${CMD_PATH}");
+	println (" tizen: " + project.tizenPath);
 
-	File file = new File("asdf")  
-	println "file has ${file.length()} bytes"
+	if( project.hasProperty("profile")) {
+		Profile = "${profile}".toString();
+	}else{
+		Profile = "mobile";
+	}
+	project.ext.set("profile", Profile);
+	println (" profile: " + project.profile);
 
-	//String fileContents = new File("asdf").text
-	//println (fileContents)
+	println ("================================");
+}
 
-	standardOutput = new ByteArrayOutputStream()
-	errorOutput = standardOutput
-	doLast {
-		if (execResult.exitValue != 0) {
-			println("========================================")
-			println("Exit Value is " + execResult.exitValue)
-			println("----------------------")
-			//println(standardOutput.toString())
-			println(errorOutput.toString())
-			println("========================================")
-		}else{
-			println("========================================")
-			println("Exit Value is " + execResult.exitValue)
-			println("----------------------")
+task build_native(dependsOn: checkWin) << {
+	def CMD = project.tizenPath;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
 
-			def version = "Smart Development Bridge version"
-			if( errorOutput.toString().contains(version) ){
-				println "same"
-			}else{
-				println "not same"
-			}
+	println ("================================");
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
+	println ("Exit value: " + process.exitValue());
+	//println "$sout"; println "$serr";
 
-			//println(standardOutput.toString())
-			println(errorOutput.toString())
-			println("========================================")
+	sout.eachLine { line, count ->
+		//println ("line $count: $line"); 
+
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM=splited[0];
+			TEMPLATE=splited[1];
+			NAME=TEMPLATE;
+
+			// create
+			process = ["${CMD}", "create", "native-project"
+				, "-p", "${PLATFORM}" , "-t", "${TEMPLATE}" , "-n", "${NAME}"
+				, "--", "${PLATFORM}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
+			println "$sout2"; println "$serr";
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+
+			// build
+			process = ["${CMD}", "build-native"
+				, "--arch", "x86" , "--compiler", "llvm" , "--configuration", "Debug"
+				, "--", "${PLATFORM}/${NAME}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
+			println "$sout2"; println "$serr";
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
 		}
 	}
+
+	println ("================================");
+}
+
+task package_native(dependsOn: checkWin) << {
+	def CMD = project.tizenPath;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+
+	println ("================================");
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
+	println ("Exit value: " + process.exitValue());
+	//println "$sout"; println "$serr";
+
+	sout.eachLine { line, count ->
+		//println ("line $count: $line"); 
+
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM=splited[0];
+			TEMPLATE=splited[1];
+			NAME=TEMPLATE;
+
+			// pacage
+			process = ["${CMD}", "package"
+				, "--type", "tpk"
+				, "--", "${PLATFORM}/${NAME}/Debug"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
+			println "$sout2"; println "$serr";
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
+
+	println ("================================");
+}
+
+task test1(dependsOn: checkWin) << {
+	tasks["build_native"].execute();
+	tasks["package_native"].execute();
 }
 
