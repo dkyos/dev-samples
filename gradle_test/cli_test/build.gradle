@@ -55,9 +55,10 @@ task build_native(dependsOn: checkWin) << {
 
 		if (line.contains(project.profile) ){
 			String[] splited = line.split("\\s+");
-			PLATFORM=splited[0];
-			TEMPLATE=splited[1];
-			NAME=TEMPLATE;
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
 			// create
 			process = ["${CMD}", "create", "native-project"
@@ -104,9 +105,10 @@ task package_native(dependsOn: checkWin) << {
 
 		if (line.contains(project.profile) ){
 			String[] splited = line.split("\\s+");
-			PLATFORM=splited[0];
-			TEMPLATE=splited[1];
-			NAME=TEMPLATE;
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
 			// pacage
 			process = ["${CMD}", "package"
