@@ -8,493 +8,507 @@ import static groovy.io.FileType.FILES
 defaultTasks 'checkWin'
 
 task checkWin() {
-    def CMD_PATH='';
-    String Profile;
 
-    println ("================================");
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        println "*** Windows";
-        CMD_PATH='C:/tizen-sdk/tools/ide/bin/tizen.bat';
-    }else{
-        println "*** Not Windwos";
-        CMD_PATH='/home/dkyun77/tizen-sdk/tools/ide/bin/tizen';
-    }
+	try {
+		def CMD_PATH='';
+		String Profile;
 
-    project.ext.set("tizenPath", "${CMD_PATH}");
-    println (" tizen: " + project.tizenPath);
+		println ("================================");
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			println "OS: Windows";
+			CMD_PATH='C:/tizen-sdk/tools/ide/bin/tizen.bat';
+		}else{
+			println "OS: Not Windwos";
+			CMD_PATH='/home/dkyun77/tizen-sdk/tools/ide/bin/tizen';
+		}
 
-    if( project.hasProperty("profile")) {
-        Profile = "${profile}".toString();
-    }else{
-        Profile = "mobile";
-    }
-    project.ext.set("profile", Profile);
-    println (" profile: " + project.profile);
+		project.ext.set("tizenPath", "${CMD_PATH}");
+		println ("tizen: " + project.tizenPath);
 
-    File dir = new File (".");
-    project.ext.set("pwd", dir.getCanonicalPath());
-    println (" current dir(pwd): " + project.pwd);
+		// If it doesn't exist
+		File f = new File("${CMD_PATH}");
+		if( ! f.exists() ) {
+			println (project.tizenPath + " does not exist");
+			println ("Please check your 'tizen' command location");
+			throw new Exception("Error");
+		}
 
-    println ("================================");
+		if( project.hasProperty("profile")) {
+			Profile = "${profile}".toString();
+		}else{
+			Profile = "mobile";
+		}
+		project.ext.set("profile", Profile);
+		println ("profile: " + project.profile);
+
+		File dir = new File (".");
+		project.ext.set("pwd", dir.getCanonicalPath());
+		println ("Current dir(pwd): " + project.pwd);
+
+	} catch (Exception e) {
+		println ("Error:" + e.toString());
+	}
+
+	println ("================================");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 task list_native(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    int total = 0;
+	def CMD = project.tizenPath;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	int total = 0;
 
-    def process = ["${CMD}","list", "native-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
-        if (line.contains(project.profile) ){
-            total++;
-        }
-    }
+	sout.eachLine { line, count ->
+		if (line.contains(project.profile) ){
+			total++;
+		}
+	}
 
-    if( process.exitValue() != 0 ){
-        println ("list native-project: Fail");
-        println ("$sout"); println ("$serr");
-    }
+	if( process.exitValue() != 0 ){
+		println ("Fail   : list native-project");
+		println ("$sout"); println ("$serr");
+	}
 
-    if( total > 0 ){
-        println ("list native-project: Success ($total listing)");
-    }else{
-        println ("list native-project: Fail");
-        println ("$sout"); println ("$serr");
-    }
+	if( total > 0 ){
+		println ("Success: list native-project ($total listing)");
+	}else{
+		println ("Fail   : list native-project");
+		println ("$sout"); println ("$serr");
+	}
 }
 
 task create_native(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "native-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // create
-            process = ["${CMD}", "create", "native-project"
-                , "-p", "${PLATFORM}" , "-t", "${TEMPLATE}" , "-n", "${NAME}"
-                , "--", "${PWD}/${PLATFORM}"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// create
+			process = ["${CMD}", "create", "native-project"
+				, "-p", "${PLATFORM}" , "-t", "${TEMPLATE}" , "-n", "${NAME}"
+				, "--", "${PWD}/${PLATFORM}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("create native-project: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("Fail   : create native-project");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 
-    if( errno == 0 ){
-        println ("create native-project: Success");
-    }else{
-        println ("create native-project: Fail");
-    }
+	if( errno == 0 ){
+		println ("Success: create native-project");
+	}else{
+		println ("Fail   : create native-project");
+	}
 }
 
 task build_native(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "native-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // build
-            process = ["${CMD}", "build-native" , "--arch", "x86"
-                , "--compiler", "llvm" , "--configuration", "Debug"
-                , "--", "${PWD}/${PLATFORM}/${NAME}"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// build
+			process = ["${CMD}", "build-native" , "--arch", "x86"
+				, "--compiler", "llvm" , "--configuration", "Debug"
+				, "--", "${PWD}/${PLATFORM}/${NAME}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("build-native: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("Fail   : build-native");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 
-    if( errno == 0 ){
-        println ("build-native: Success");
-    }else{
-        println ("build-native: Fail");
-    }
+	if( errno == 0 ){
+		println ("Success: build-native");
+	}else{
+		println ("Fail   : build-native");
+	}
 }
 
 task package_native(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "native-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // package
-            process = ["${CMD}", "package" , "--type", "tpk"
-                , "--", "${PWD}/${PLATFORM}/${NAME}/Debug"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// package
+			process = ["${CMD}", "package" , "--type", "tpk"
+				, "--", "${PWD}/${PLATFORM}/${NAME}/Debug"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("package native: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("package native");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 
-    if( errno == 0 ){
-        println ("package native: Success");
-    }else{
-        println ("package native: Fail");
-    }
+	if( errno == 0 ){
+		println ("Success: package native");
+	}else{
+		println ("Fail   : package native");
+	}
 }
 
 task check_native(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
 
-    def process = ["${CMD}","list", "native-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "native-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
-            int success = 0;
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
+			int success = 0;
 
-            new File("${PWD}/${PLATFORM}/${NAME}").eachFileRecurse(FILES) {
-                if( it.name.endsWith('.so') ||  it.name.endsWith('.a') 
-                        ||  it.name.endsWith('.tpk') ){
-                    println ("${NAME}: Success: $it.name");
-                    success = 1;
-                }
-            }
+			new File("${PWD}/${PLATFORM}/${NAME}").eachFileRecurse(FILES) {
+				if( it.name.endsWith('.so') ||  it.name.endsWith('.a') 
+						||  it.name.endsWith('.tpk') ){
+					println ("Success: ${NAME}: $it.name");
+					success = 1;
+				}
+			}
 
-            if (success == 0 ){
-                println ("${NAME}: Fail");
-            }
+			if (success == 0 ){
+				println ("Fail   : ${NAME}");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 }
 
 task nativeApp(dependsOn: checkWin) << {
-    tasks["list_native"].execute();
-    tasks["create_native"].execute();
-    tasks["build_native"].execute();
-    tasks["package_native"].execute();
-    tasks["check_native"].execute();
+	tasks["list_native"].execute();
+	tasks["create_native"].execute();
+	tasks["build_native"].execute();
+	tasks["package_native"].execute();
+	tasks["check_native"].execute();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 task list_web(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    int total = 0;
+	def CMD = project.tizenPath;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	int total = 0;
 
-    def process = ["${CMD}","list", "web-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "web-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
-        if (line.contains(project.profile) ){
-            total++;
-        }
-    }
+	sout.eachLine { line, count ->
+		if (line.contains(project.profile) ){
+			total++;
+		}
+	}
 
-    if( process.exitValue() != 0 ){
-        println ("list web-project: Fail");
-        println ("$sout"); println ("$serr");
-    }
+	if( process.exitValue() != 0 ){
+		println ("Fail   : list web-project");
+		println ("$sout"); println ("$serr");
+	}
 
-    if( total > 0 ){
-        println ("list web-project: Success ($total listing)");
-    }else{
-        println ("list web-project: Fail");
-        println ("$sout"); println ("$serr");
-    }
+	if( total > 0 ){
+		println ("Success: list web-project ($total listing)");
+	}else{
+		println ("Fail   : list web-project");
+		println ("$sout"); println ("$serr");
+	}
 }
 
 task create_web(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "web-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "web-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // create
-            process = ["${CMD}", "create", "web-project"
-                , "-p", "${PLATFORM}" , "-t", "${TEMPLATE}" , "-n", "${NAME}"
-                , "--", "${PWD}/${PLATFORM}"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// create
+			process = ["${CMD}", "create", "web-project"
+				, "-p", "${PLATFORM}" , "-t", "${TEMPLATE}" , "-n", "${NAME}"
+				, "--", "${PWD}/${PLATFORM}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("create web-project: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("Fail   : create web-project");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 
-    if( errno == 0 ){
-        println ("create web-project: Success");
-    }else{
-        println ("create web-project: Fail");
-    }
+	if( errno == 0 ){
+		println ("Success: create web-project");
+	}else{
+		println ("Fail   : create web-project");
+	}
 }
 
 task build_web(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "web-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "web-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // build
-            process = ["${CMD}", "build-web"
-                , "--", "${PWD}/${PLATFORM}/${NAME}"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// build
+			process = ["${CMD}", "build-web"
+				, "--", "${PWD}/${PLATFORM}/${NAME}"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("build-web: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("Fail   : build-web");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 
-    if( errno == 0 ){
-        println ("build-web: Success");
-    }else{
-        println ("build-web: Fail");
-    }
+	if( errno == 0 ){
+		println ("Success: build-web");
+	}else{
+		println ("Fail   : build-web");
+	}
 }
 
 task package_web(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
-    int errno = 0;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
+	int errno = 0;
 
-    def process = ["${CMD}","list", "web-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "web-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
 
-            // package
-            process = ["${CMD}", "package" , "--type", "wgt"
-                , "--", "${PWD}/${PLATFORM}/${NAME}/.buildResult"].execute();
-            process.consumeProcessOutput(sout2, serr2);
-            process.waitFor();
+			// package
+			process = ["${CMD}", "package" , "--type", "wgt"
+				, "--", "${PWD}/${PLATFORM}/${NAME}/.buildResult"].execute();
+			process.consumeProcessOutput(sout2, serr2);
+			process.waitFor();
 
-            if( process.exitValue() != 0 ){
-                errno++;
-                println ("package web: Fail");
-                println ("$sout2"); println ("$serr2");
-            }
+			if( process.exitValue() != 0 ){
+				errno++;
+				println ("Fail   : package web");
+				println ("$sout2"); println ("$serr2");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
-    if( errno == 0 ){
-        println ("package web: Success");
-    }else{
-        println ("package web: Fail");
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
+	if( errno == 0 ){
+		println ("Success: package web");
+	}else{
+		println ("Fail   : package web");
+	}
 }
 
 task check_web(dependsOn: checkWin) << {
-    def CMD = project.tizenPath;
-    def PWD = project.pwd;
-    def sout = new StringBuilder();
-    def serr = new StringBuilder();
-    def sout2 = new StringBuilder();
-    def serr2 = new StringBuilder();
-    def PLATFORM;
-    def TEMPLATE;
-    def NAME;
+	def CMD = project.tizenPath;
+	def PWD = project.pwd;
+	def sout = new StringBuilder();
+	def serr = new StringBuilder();
+	def sout2 = new StringBuilder();
+	def serr2 = new StringBuilder();
+	def PLATFORM;
+	def TEMPLATE;
+	def NAME;
 
-    def process = ["${CMD}","list", "web-project"].execute();
-    process.consumeProcessOutput(sout, serr);
-    process.waitFor();
+	def process = ["${CMD}","list", "web-project"].execute();
+	process.consumeProcessOutput(sout, serr);
+	process.waitFor();
 
-    sout.eachLine { line, count ->
+	sout.eachLine { line, count ->
 
-        if (line.contains(project.profile) ){
-            String[] splited = line.split("\\s+");
-            PLATFORM = splited[0];
-            TEMPLATE = splited[1];
-            NAME = splited[1].replaceAll('_','');
-            NAME = NAME.replaceAll('-','');
-            int success = 0;
+		if (line.contains(project.profile) ){
+			String[] splited = line.split("\\s+");
+			PLATFORM = splited[0];
+			TEMPLATE = splited[1];
+			NAME = splited[1].replaceAll('_','');
+			NAME = NAME.replaceAll('-','');
+			int success = 0;
 
-            new File("${PWD}/${PLATFORM}/${NAME}").eachFileRecurse(FILES) {
-                if( it.name.endsWith('.wgt') ){
-                    println ("${NAME}: Success: $it.name");
-                    success = 1;
-                }
+			new File("${PWD}/${PLATFORM}/${NAME}").eachFileRecurse(FILES) {
+				if( it.name.endsWith('.wgt') ){
+					println ("Success: ${NAME}: $it.name");
+					success = 1;
+				}
 
-            }
+			}
 
-            if (success == 0 ){
-                println ("${NAME}: Fail");
-            }
+			if (success == 0 ){
+				println ("Fail   : ${NAME}");
+			}
 
-            sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
-        }
-    }
+			sout2.delete(0, sout2.length()); serr2.delete(0, serr2.length());
+		}
+	}
 }
 
 task webApp(dependsOn: checkWin) << {
-    tasks["list_web"].execute();
-    tasks["create_web"].execute();
-    tasks["build_web"].execute();
-    tasks["package_web"].execute();
-    tasks["check_web"].execute();
+	tasks["list_web"].execute();
+	tasks["create_web"].execute();
+	tasks["build_web"].execute();
+	tasks["package_web"].execute();
+	tasks["check_web"].execute();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 task AllApp(dependsOn: checkWin) << {
-    tasks["nativeApp"].execute();
-    tasks["webApp"].execute();
+	tasks["nativeApp"].execute();
+	tasks["webApp"].execute();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
