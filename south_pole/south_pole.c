@@ -27,11 +27,8 @@ int test1(double dist_t, int N)
     int L1[102] = {0};
     int L2[102] = {0};
 
-    memset(L1, 0, sizeof(L1));
     L1[0] = 1;
-    memset(L2, 0, sizeof(L2));
     L2[0] = 1;
-    memset(connected, 0, sizeof(connected));
     connected[0] = 1;
     connect_num = 1;
 
@@ -54,14 +51,6 @@ int test1(double dist_t, int N)
                 }
             }
         }
-
-#if 0
-        D("Connect Num = [%d] \n", connect_num);
-        for(k=0; k<N; k++){
-            D("[%d]", connected[k]);
-        }
-        D("\n");
-#endif
 
         if(connect_num == N)
             break;
@@ -97,53 +86,42 @@ int main()
     D("T = %d \n", T);
 
     for(t=0; t<T; t++){
+
         result = 0;
         memset(data, 0, sizeof(data));
         memset(dist_total, 0, sizeof(dist_total));
+        memset(ordered, 0, sizeof(ordered));
 
         scanf("%d", &N);
         D("N = %d \n", N);
+
         for(n=0; n<N; n++){
-
-            scanf("%lf ", &data[n][0]);
-            scanf("%lf", &data[n][1]);
+            scanf("%lf %lf", &data[n][0], &data[n][1]);
             D("[%3d] (%.2lf, %.2lf) \n", n, data[n][0], data[n][1]);
-
         }
 
         total = 0;
-        for(n=0; n<N; n++){
+
+        for(i=0; i<N; i++){
+
             double dist = 0;
-            unsigned long long tmp;
 
-            for(i=0; i<N; i++){
+            for(j=0; j<N; j++){
 
-                dist = (data[n][0] - data[i][0])*(data[n][0] - data[i][0]) 
-                    + (data[n][1] - data[i][1])*(data[n][1] - data[i][1]);
+                dist = (data[i][0] - data[j][0])*(data[i][0] - data[j][0]) 
+                    + (data[i][1] - data[j][1])*(data[i][1] - data[j][1]);
                 dist = sqrt(dist);
 
-                dist = dist * 100;
-                dist = dist + 0.5;
-                tmp = dist;
+                dist_total[i][j] = dist;
+                ordered[total] = dist;
 
-
-                dist_total[n][i] = (double)(tmp)/100;
-
-                ordered[total] = (double)(tmp)/100;
-
-                //D("[%d][%d] = %.2lf \n", n, i, dist_total[n][i]);
+                D("[%d][%d] = %.2lf \n", i, j, dist_total[i][j]);
 
                 total++;
             }
         }
 
         qsort(ordered, MAX, sizeof(ordered[0]), compare);
-
-#ifdef DEBUG
-        for(i=0; i<total; i++){
-            D("(%3d) :  [%3.2lf] \n", i , ordered[i]);
-        }
-#endif
 
         xl = 0;
         xh = total;
@@ -172,3 +150,5 @@ int main()
 
     return 0;
 }
+
+
