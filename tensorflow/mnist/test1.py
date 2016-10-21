@@ -14,22 +14,18 @@ y_ = tf.placeholder("float", [None,10])
 
 cross_entropy = -tf.reduce_sum(y_*tf.log(y))
 
-# 학습 오퍼레이션
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
-# 모든 변수 초기화
 init = tf.initialize_all_variables()
 
 sess = tf.Session()
 sess.run(init)
 
-# 임의로 100개 샘플링
 for i in range(1000):
   batch_xs, batch_ys = mnist.train.next_batch(100)
   sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
 
 
-# 정답율
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
