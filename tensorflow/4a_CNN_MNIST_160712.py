@@ -142,7 +142,7 @@ Y_pred = Y_pred_all['L_out']
 
 # In[9]:
 
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(Y_pred, Y))
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=Y, logits=Y_pred))
 learning_rate = 0.001
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
 training_epochs = 5
