@@ -171,7 +171,7 @@ nTestSub = (int)(nTest/divide_test);
 
 #with tf.Session() as sess:   
 sess = tf.InteractiveSession()
-sess.run(tf.initialize_all_variables())
+tf.global_variables_initializer().run()
 
 for epoch in range(training_epochs):
     nBatch  = int(nTrain/batch_size)

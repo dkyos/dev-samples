@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # \* *[Notice] I wrote thie code while following the examples in [Choi's Tesorflow-101 tutorial](https://github.com/sjchoi86/Tensorflow-101). And,  as I know, most of Choi's examples originally come from [Aymeric Damien's](https://github.com/aymericdamien/TensorFlow-Examples/) and  [Nathan Lintz's ](https://github.com/nlintz/TensorFlow-Tutorials) tutorials.*
@@ -40,7 +39,7 @@ print (X_train.shape, X_test.shape, Y_train.shape, Y_test.shape)
 # In[4]:
 
 myIdx = 36436   # any number
-img   = np.reshape(X_train[myIdx, :], (28, 28)) # 28 * 28 = 784
+img   = np.reshape(X_train[myIdx, ], (28, 28)) # 28 * 28 = 784
 
 plt.matshow(img, cmap=plt.get_cmap('gray'))
 plt.show()
@@ -106,7 +105,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 # In[18]:
 
 with tf.Session() as sess:
-    sess.run(tf.initialize_all_variables())
+    tf.global_variables_initializer().run()
 
     for epoch in range(training_epochs):
         nBatch  = int(nTrain/batch_size)
