@@ -128,9 +128,9 @@ with tf.Session() as sess:
         if (epoch+1) % display_epoch == 0:
             loss_temp = sess.run(loss, feed_dict={X: X_train, Y:Y_train}) 
             accuracy_temp = accuracy.eval({X: X_train, Y:Y_train})
-            print "(epoch {})".format(epoch+1) 
-            print "[Loss / Tranining Accuracy] {:05.4f} / {:05.4f}".format(loss_temp, accuracy_temp)
-            print " "
+            print ("(epoch {})".format(epoch+1) )
+            print ("[Loss / Tranining Accuracy] {:05.4f} / {:05.4f}".format(loss_temp, accuracy_temp))
+            print (" ")
             
-    print "[Test Accuracy] ",  accuracy.eval({X: X_test, Y: Y_test})   
+    print ("[Test Accuracy] ",  accuracy.eval({X: X_test, Y: Y_test}))
 

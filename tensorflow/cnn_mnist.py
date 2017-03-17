@@ -59,9 +59,9 @@ def main(_):
     batch_size = 100
 
     hyp = model(X,w1,w2,w3,w4,w_h,droprate_hidden,droprate_last)
-    print hyp
-    print Y
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(hyp,Y))
+    print (hyp)
+    print (Y)
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=Y, logits=hyp))
 
     tf.train.AdamOptimizer
     optimizer =tf.train.RMSPropOptimizer(0.001,0.9).minimize(cost)
@@ -82,14 +82,14 @@ def main(_):
                 test_index = test_index[0:256]
                 accruacy = np.mean(np.argmax(test_y[test_index],axis=1) \
                         == sess.run(predict_optimizer,feed_dict={X:test_x[test_index],Y:test_y[test_index],droprate_last:1.0,droprate_hidden:1.0}))
-                print "Accuracy :"+str(accruacy)
+                print ("Accuracy :"+str(accruacy))
 
             sess.run(optimizer,\
                     feed_dict={X:x_data[start:end],Y:y_data[start:end],\
                     droprate_hidden:0.8,\
                     droprate_last:0.5})
 
-            print str(count)+"/"+str(count_size),start,end, \
+            print (str(count)+"/"+str(count_size),start,end, \
                 ("cost:"+str(\
                     sess.run(cost,\
                             feed_dict={X:x_data[start:end],Y:y_data[start:end],\
@@ -97,7 +97,7 @@ def main(_):
                             droprate_last:0.5}\
                         )\
                     )\
-                )
+                ))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

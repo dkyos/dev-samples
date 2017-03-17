@@ -195,11 +195,11 @@ for epoch in range(training_epochs):
             myIdx2 = (kk+1)*nTestSub
             accuracy_test_temp += accuracy.eval({X: X_test[myIdx1:myIdx2,:], Y: Y_test[myIdx1:myIdx2,:], dropout_prob:1.}) 
 
-        print "(epoch {})".format(epoch+1) 
-        print "[Loss / Tranining Accuracy / Test Accuracy] {:05.4f} / {:05.4f} / {:05.4f}".format(loss_temp/divide_train, accuracy_train_temp/divide_train, accuracy_test_temp/divide_test)
-        print " "
+        print ("(epoch {})".format(epoch+1))
+        print ("[Loss / Tranining Accuracy / Test Accuracy] {:05.4f} / {:05.4f} / {:05.4f}".format(loss_temp/divide_train, accuracy_train_temp/divide_train, accuracy_test_temp/divide_test))
+        print (" ")
 
-print "[Test Accuracy] {:05.4f}".format(accuracy_test_temp/divide_test)
+print ("[Test Accuracy] {:05.4f}".format(accuracy_test_temp/divide_test))
 
 
 # ## Let's see the learned features
