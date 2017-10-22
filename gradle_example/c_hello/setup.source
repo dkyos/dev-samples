@@ -1,7 +1,0 @@
-
-#export GRADLE_HOME=/home/dkyun77/Gradle/install/gradle-2.3
-export GRADLE_HOME=/home/dkyun77/.gradle/wrapper/dists/gradle-2.3-bin/a48v6zq5mdp1uyn9rwlj56945/gradle-2.3
-
-export PATH=$PATH:$GRADLE_HOME/bin
-
-
