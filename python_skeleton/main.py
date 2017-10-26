@@ -8,29 +8,17 @@
 import argparse
 from sc_header import *
 from sc_logger import sc_logger
+from sc_csv import *
 # [END skeleton_import]
 
 # singleton logger
 logger = sc_logger.get_logger()
 
 # [START def_analyze]
-def analyze(test_filename):
+def analyze(filename):
     """Run test."""
-
     logger.info("start analyzing...")
-
-    df = pd.DataFrame()
-    try:
-        df = pd.read_csv(test_filename
-            , sep='|'
-            , dtype='object'
-            , error_bad_lines=False , quoting=csv.QUOTE_NONE
-            , encoding='utf-8')
-        logger.info("read_csv: %s" % df.shape )
-    except: # catch *all* exceptions
-        e = sys.exc_info()[0]
-        logger.error("Error: %s " % e )
-
+    df = load_csv_to_df(filename)
     return df
 # [END def_analyze]
 
@@ -39,9 +27,9 @@ if __name__ == '__main__':
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
-        'test_filename',
+        'filename',
         help='The filename of testing you\'d like to analyze.')
     args = parser.parse_args()
 
-    analyze(args.test_filename)
+    analyze(args.filename)
 # [END skeleton]
