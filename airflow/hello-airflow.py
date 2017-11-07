@@ -12,7 +12,7 @@ dag = DAG('hello-airflow',description='Hello airflow DAG',
 
 
 def print_hello():
-    return 'Hello Airflow'
+    return '[Python Task] Hello Airflow'
 
 
 python_task = PythonOperator(
@@ -22,7 +22,7 @@ python_task = PythonOperator(
 
 
 bash_task = BashOperator(
-        task_id='print_date',
+        task_id='bash_operator',
         bash_command='date',
         dag=dag)
 
