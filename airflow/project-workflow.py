@@ -10,15 +10,6 @@ dag = DAG('project-workflow',description='Project Workflow DAG',
         start_date=datetime(2017,7,1),
         catchup=False)
 
-def print_hello():
-    return '[Python Task] Hello Airflow'
-
-
-python_task = PythonOperator(
-                    task_id='python_operator',
-                    python_callable = print_hello,
-                    dag = dag)
-
 xlsx_to_csv_task = BashOperator(
         task_id='xlsx_to_csv_operator',
         bash_command='sleep 1 && echo [xlsx_to_csv start]',
@@ -64,19 +55,19 @@ segmentation_task = BashOperator(
         bash_command='sleep 1 && echo [segmentation start]',
         dag=dag)
 
-merge_task.set_downstream(xlsx_to_csv_task)
-cleansing_task.set_downstream(merge_task)
-x1_task.set_downstream(cleansing_task)
-x2_task.set_downstream(cleansing_task)
-x3_task.set_downstream(cleansing_task)
-y1_task.set_downstream(cleansing_task)
-y2_task.set_downstream(cleansing_task)
+merge_task.set_upstream(xlsx_to_csv_task)
+cleansing_task.set_upstream(merge_task)
+x1_task.set_upstream(cleansing_task)
+x2_task.set_upstream(cleansing_task)
+x3_task.set_upstream(cleansing_task)
+y1_task.set_upstream(cleansing_task)
+y2_task.set_upstream(cleansing_task)
 
-x1_task.set_upstream(segmentation_task)
-x2_task.set_upstream(segmentation_task)
-x3_task.set_upstream(segmentation_task)
+x1_task.set_downstream(segmentation_task)
+x2_task.set_downstream(segmentation_task)
+x3_task.set_downstream(segmentation_task)
 
-y1_task.set_upstream(segmentation_task)
-y2_task.set_upstream(segmentation_task)
+y1_task.set_downstream(segmentation_task)
+y2_task.set_downstream(segmentation_task)
 
 
