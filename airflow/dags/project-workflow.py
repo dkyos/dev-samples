@@ -15,19 +15,23 @@ dag = DAG('project-workflow',description='Project Workflow DAG',
 
 xlsx_to_csv_task = BashOperator(
         task_id='xlsx_to_csv',
-        bash_command='"$SRC"/test.sh "$COUNTRY"',
-        env={'SRC': SRC, 'COUNTRY': COUNTRY},
+        bash_command='"$src"/test.sh "$country" 2nd_param_xlsx',
+        env={'src': SRC, 'country': COUNTRY},
         dag=dag)
 
-merge_command = SRC + '/test.sh ' + COUNTRY + ' 2nd_param_test'
+merge_command = SRC + '/test.sh ' + COUNTRY + ' 2nd_param_merge'
 merge_task = BashOperator(
         task_id='merge',
         bash_command=merge_command ,
         dag=dag)
 
+my_templated_command = """
+{{ params.src }}/test.sh {{ params.country}} 2nd_param_cleansing
+"""
 cleansing_task = BashOperator(
         task_id='cleansing',
-        bash_command='sleep 1 && echo [cleansing start]',
+        bash_command=my_templated_command, 
+        params={'src': SRC, 'country': COUNTRY},
         dag=dag)
 
 x1_task = BashOperator(
