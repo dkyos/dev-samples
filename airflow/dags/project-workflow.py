@@ -5,8 +5,10 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime,timedelta
 from airflow.models import Variable
 
-SRC=Variable.get("SRC")
-COUNTRY=Variable.get("COUNTRY")
+#SRC=Variable.get("SRC")
+SRC='./'
+#COUNTRY=Variable.get("COUNTRY")
+COUNTRY='PL'
 
 dag = DAG('project-workflow',description='Project Workflow DAG',
         schedule_interval = '*/5 0 * * *',

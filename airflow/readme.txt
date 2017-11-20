@@ -3,6 +3,9 @@ http://bcho.tistory.com/1184
 
 pip install airflow
 
+
+
+export AIRFLOW_HOME=./
 airflow initdb
 airflow webserver -p 8080
 
