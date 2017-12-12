@@ -10,8 +10,22 @@ Use Logstash to load CSV into Elasticsearch
 https://www.youtube.com/watch?v=imrKm6dV3NQ
 Lecture 16 logstash job Kibana visualization
 
+====================================================================
+sample Dev Tools
+====================================================================
 
+get /cars
 
+get /cars/_search
+{
+    "query": {
+        "match_all":{}
+    }
+}
+
+get /cars/_count
+
+====================================================================
 
 
 
