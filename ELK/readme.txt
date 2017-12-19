@@ -25,6 +25,19 @@ get /cars/_search
 
 get /cars/_count
 
+
+# cat config/elasticsearch.yml | grep disk
+cluster.routing.allocation.disk.threshold_enabled: false
+
+PUT _cluster/settings
+{
+    "transient": {
+        "cluster.routing.allocation.disk.threshold_enabled": false
+    }
+}
+
+
+
 ====================================================================
 
 
