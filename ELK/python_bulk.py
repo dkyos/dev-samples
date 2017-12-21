@@ -212,12 +212,13 @@ def to_int(s):
 def get_chunk(data):
     print(" get_chunk - " + str(data.shape))
     data = data.fillna('')
-    contents = []
+    actions = []
     for index, row in data.iterrows():
-        content = {
-            "_index": "cars",
-            "_type": "cars_doc",
-            "_id": index,
+        action = {
+            '_op_type': 'index',
+            "_index": 'cars',
+            "_type": 'cars_doc',
+            "_id": int(index),
             "_source": {
                 "maker":row['maker'],
                 "model":row['model'],
@@ -230,24 +231,22 @@ def get_chunk(data):
                 "stk_year":row["stk_year"],
                 "transmission":row["transmission"],
                 "door_count":row["door_count"],
-                "seat_count":to_int(row["seat_count"]),
+                "seat_count":row["seat_count"],
                 "fuel_type":row["fuel_type"],
                 "date_created":row["date_created"],
                 "date_last_seen":row["date_last_seen"],
                 "price_eur":row["price_eur"]
             }
         }
-        #es.index(index="cars", doc_type="cars_doc", id=index, body=content)
-        contents.append(content)
+        actions.append(action)
 
-    print(contents)
-    #helpers.bulk(es, contents)
+    helpers.bulk(es, actions)
 
     return data
 
 data = pd.DataFrame()
 count = 1
-chunksize=1
+chunksize=1000
 for chunk in pd.read_csv(csv_file , sep=',' , dtype='object' , usecols = load_cols
             , error_bad_lines=False , quoting=csv.QUOTE_NONE , chunksize=chunksize
             , encoding='utf-8'):
