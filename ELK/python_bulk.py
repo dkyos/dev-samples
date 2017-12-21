@@ -246,7 +246,7 @@ def get_chunk(data):
 
 data = pd.DataFrame()
 count = 1
-chunksize=1000
+chunksize=50000
 for chunk in pd.read_csv(csv_file , sep=',' , dtype='object' , usecols = load_cols
             , error_bad_lines=False , quoting=csv.QUOTE_NONE , chunksize=chunksize
             , encoding='utf-8'):
