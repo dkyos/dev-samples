@@ -18,12 +18,15 @@ def analyze(filename):
     return df
 
 if __name__ == '__main__':
+    args = sys.argv[1:]
+
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument(
-        'filename',
+
+    parser.add_argument( "-F", "--filename",
         help='The filename of testing you\'d like to analyze.')
-    args = parser.parse_args()
+
+    args = parser.parse_args(args)
 
     analyze(args.filename)

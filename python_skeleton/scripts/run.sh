@@ -1,5 +1,5 @@
 #!/bin/bash
 
-../apps/main.py
+../apps/main.py -F ../apps/test.csv
 
 

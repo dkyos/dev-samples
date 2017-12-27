@@ -25,7 +25,7 @@ class sc_logger(SingletonInstance):
         self._logger = logging.getLogger("myLogger")
         self._logger.setLevel(logging.INFO)
         formatter = logging.Formatter(
-            '[%(levelname)s|%(filename)s:%(lineno)s] %(asctime)s > %(message)s')
+            '[%(asctime)s][%(levelname)s|%(filename)s:%(lineno)s] > %(message)s')
 
         import datetime
         now = datetime.datetime.now()
