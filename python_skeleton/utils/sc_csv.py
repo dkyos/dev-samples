@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
-from sc_header import *
-from sc_logger import sc_logger
+from utils.sc_header import *
+from utils.sc_logger import *
 
 # singleton logger
 logger = sc_logger.get_logger()
