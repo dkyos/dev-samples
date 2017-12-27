@@ -2,9 +2,7 @@
 #-*- coding: utf-8 -*-
 
 import argparse
-import sys
-
-sys.path.append("./")
+from init import *
 
 from utils.sc_header import *
 from utils.sc_logger import *
