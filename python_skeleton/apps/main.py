@@ -4,8 +4,8 @@
 import argparse
 from init import *
 
-from utils.sc_header import *
 from utils.sc_logger import *
+from utils.sc_header import *
 from utils.sc_csv import *
 
 # singleton logger

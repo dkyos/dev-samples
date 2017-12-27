@@ -1,7 +1,6 @@
 #-*- coding: utf-8 -*-
 
-import logging
-import os
+from utils.sc_header import *
 
 class SingletonInstance:
     __instance = None
