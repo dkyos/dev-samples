@@ -4,8 +4,10 @@ import pandas as pd
 import sys
 import csv
 
-from utils.sc_logger import *
-logger = sc_logger.get_logger()
+from config import *
+
+config = Config()
+logger = config.logger
 
 def load_csv_to_df(filename):
     df = pd.DataFrame()
@@ -31,4 +33,8 @@ def save_df_to_csv(df, filename):
         logger.error("Error: %s " % e )
     return
 
+def test():
+    logger.info("general_utils test")
 
+if __name__ == "__main__":
+    test()

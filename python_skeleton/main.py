@@ -2,13 +2,12 @@
 #-*- coding: utf-8 -*-
 
 import argparse
-from init import *
 
-from utils.sc_logger import *
-from utils.sc_csv import *
+from general_utils import *
+from config import *
 
-# singleton logger
-logger = sc_logger.get_logger()
+config = Config()
+logger = config.logger
 
 def analyze(filename):
     """Run test."""
@@ -28,4 +27,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args(args)
 
-    analyze(args.filename)
+    if args.filename is None:
+        filename = config.filename
+    else:
+        filename = args.filename
+
+    analyze(filename)
