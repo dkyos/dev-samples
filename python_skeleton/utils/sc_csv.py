@@ -1,6 +1,9 @@
 #-*- coding: utf-8 -*-
 
-from utils.sc_header import *
+import pandas as pd
+import sys
+import csv
+
 from utils.sc_logger import *
 logger = sc_logger.get_logger()
 
