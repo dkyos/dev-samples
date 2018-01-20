@@ -3,8 +3,8 @@
 
 import argparse
 
-from general_utils import *
-from config import *
+from utils.general_utils import *
+from config.config import *
 
 config = Config()
 logger = config.logger

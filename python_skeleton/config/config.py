@@ -1,4 +1,4 @@
-from logger import *
+from utils.logger import *
 
 class Config():
     def __init__(self, load=True):

@@ -4,7 +4,7 @@ import pandas as pd
 import sys
 import csv
 
-from config import *
+from config.config import *
 
 config = Config()
 logger = config.logger
