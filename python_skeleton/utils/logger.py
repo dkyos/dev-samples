@@ -36,7 +36,12 @@ class sc_logger(SingletonInstance):
         dirname = './log'
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        fileHandler = logging.FileHandler(dirname + "/"+now.strftime("%Y-%m-%d_%H-%M-%S")+".log")
+        filename = now.strftime("%Y-%m-%d_%H-%M-%S")+".log"
+        latestlink = dirname + "/latest.log"
+        fileHandler = logging.FileHandler(dirname + "/" + filename)
+        if os.path.isfile(latestlink):
+            os.remove(latestlink)
+        os.symlink(filename, latestlink)
         streamHandler = logging.StreamHandler()
 
         fileHandler.setFormatter(formatter)
