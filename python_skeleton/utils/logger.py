@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
-from utils.sc_header import *
+import logging
+import os
 
 class SingletonInstance:
     __instance = None
@@ -35,7 +36,12 @@ class sc_logger(SingletonInstance):
         dirname = './log'
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        fileHandler = logging.FileHandler(dirname + "/"+now.strftime("%Y-%m-%d_%H-%M-%S")+".log")
+        filename = now.strftime("%Y-%m-%d_%H-%M-%S")+".log"
+        latestlink = dirname + "/latest.log"
+        fileHandler = logging.FileHandler(dirname + "/" + filename)
+        if os.path.isfile(latestlink):
+            os.remove(latestlink)
+        os.symlink(filename, latestlink)
         streamHandler = logging.StreamHandler()
 
         fileHandler.setFormatter(formatter)
@@ -52,3 +58,12 @@ class sc_logger(SingletonInstance):
         self = sc_logger.instance()
         return self._logger
 
+def test():
+    logger = sc_logger.get_logger()
+    logger.info("info message")
+    logger.warn("warn message")
+    logger.error("error message")
+    logger.debug("debug message") # not print
+
+if __name__ == "__main__":
+    test()
