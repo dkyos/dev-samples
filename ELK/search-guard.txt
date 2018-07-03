@@ -1,0 +1,32 @@
+
+
+
+sudo add-apt-repository ppa:linuxuprising/java
+sudo apt-get update
+sudo apt-get install oracle-java10-installer
+sudo apt-get install oracle-java10-set-default
+
+
+https://docs.search-guard.com/latest/search-guard-community-edition
+elasticsearch.yml
+searchguard.enterprise_modules_enabled: false
+https://example.com:9200/_searchguard/license
+
+
+https://oss.sonatype.org/content/repositories/releases/com/floragunn/search-guard-6/
+./bin/elasticsearch-plugin install -b com.floragunn:search-guard-6:6.2.4-22.1
+
+
+
+
+https://github.com/floragunncom/search-guard-kibana-plugin
+ ./bin/kibana-plugin install file:///data/ELK/packages/search-guard-kibana-plugin-6.2.4-13.zip
+ Attempting to transfer from file:///data/ELK/packages/search-guard-kibana-plugin-6.2.4-13.zip
+ Transferring 2958310 bytes....................
+ Transfer complete
+ Retrieving metadata from plugin archive
+ Extracting plugin archive
+ Extraction complete
+ Optimizing and caching browser bundles...
+ Plugin installation complete
+
