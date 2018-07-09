@@ -1,12 +1,26 @@
 #################################################################
 http://bcho.tistory.com/1184
 
-pip install airflow
+export all_proxy=http://172.21.101.204:3128/
+
+pip install apache-airflow
+# error uninstall html5lib
+pip install apache-airflow --ignore-installed html5lib 
+
+pip list | grep airflow
+apache-airflow                     1.9.0      
 
 
 
-export AIRFLOW_HOME=./
+# airflow needs a home, ~/airflow is the default,
+# but you can lay foundation somewhere else if you prefer
+# (optional)
+export AIRFLOW_HOME=.
+
+# initialize the database
 airflow initdb
+
+# start the web server, default port is 8080
 airflow webserver -p 8080
 
 
