@@ -15,9 +15,10 @@ splitted = re.split(r"([\(\)])", doc)
 print (splitted)
 
 print ("-"*80)
-doc = "( asdf OR 1324)~99 AND (asdf) OR ~( asdfasdf )"
+doc = "( (1234 and 134) and asdf OR 1324)~99 AND (asdf) OR ~( asdfasdf )"
 splitted = re.split(r"(\)\~\d*)|(\~\()|(\()|(\))", doc)
-splitted = [x.strip() for x in splitted if (x is not None) and (x is not '')]
+print (splitted)
+splitted = [x.strip() for x in splitted if (x is not None) and (x is not '') and x.strip() is not '']
 print (splitted)
 
 
