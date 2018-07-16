@@ -10,8 +10,6 @@ pip install apache-airflow --ignore-installed html5lib
 pip list | grep airflow
 apache-airflow                     1.9.0      
 
-
-
 # airflow needs a home, ~/airflow is the default,
 # but you can lay foundation somewhere else if you prefer
 # (optional)
@@ -22,6 +20,16 @@ airflow initdb
 
 # start the web server, default port is 8080
 airflow webserver -p 8080
+
+
+# add username/pasword
+# edit airflow.cfg
+# Set to true to turn on authentication:
+authenticate = True
+auth_backend = airflow.contrib.auth.backends.password_auth
+
+
+using python add default user
 
 
 airflow list_dags
